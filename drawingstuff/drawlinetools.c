@@ -38,54 +38,42 @@ void	convertndraw(t_vars vars, int movex, int movey)
 	draw_line(&vars, vars.p.p3, vars.p.p4);
 }
 
-void	drawxlines(t_vars vars, int movex, int movey)
-{
-	int	y;
-	int	x;
+void drawxlines(t_vars vars, int movex, int movey) {
+    int y;
+    pthread_t threads[vars.map.lines];
+    t_drawxyth thread_args[vars.map.lines];
 
 	y = 0;
-	while (y < vars.map.lines)
+    while (y < vars.map.lines)
 	{
-		x = 0;
-		while (x < vars.map.ppline - 1)
-		{
-			convert(&vars.p.p1, x, y, vars);
-			convert(&vars.p.p2, x + 1, y, vars);
-			vars.p.color1[0] = (vars.map.color[y][x] >> 16) & 0xFF;
-			vars.p.color1[1] = (vars.map.color[y][x] >> 8) & 0xFF;
-			vars.p.color1[2] = vars.map.color[y][x] & 0xFF;
-			vars.p.color2[0] = (vars.map.color[y][x + 1] >> 16) & 0xFF;
-			vars.p.color2[1] = (vars.map.color[y][x + 1] >> 8) & 0xFF;
-			vars.p.color2[2] = vars.map.color[y][x + 1] & 0xFF;
-			x++;
-			convertndraw(vars, movex, movey);
-		}
+        thread_args[y].vars = vars;
+        thread_args[y].i = y;
+        thread_args[y].movex = movex;
+        thread_args[y].movey = movey;
+        pthread_create(&threads[y], NULL, drawxlines_subth, &thread_args[y]);
 		y++;
-	}
+    }
+	y = 0;
+	while (y < vars.map.lines)
+        pthread_join(threads[y++], NULL);
 }
 
-void	drawylines(t_vars vars, int movex, int movey)
-{
-	int	y;
-	int	x;
+void drawylines(t_vars vars, int movex, int movey) {
+    int x;
+    pthread_t threads[vars.map.ppline];
+    t_drawxyth thread_args[vars.map.ppline];
 
 	x = 0;
-	while (x < vars.map.ppline)
+    while (x < vars.map.ppline)
 	{
-		y = 0;
-		while (y < vars.map.lines - 1)
-		{
-			convert(&vars.p.p1, x, y, vars);
-			convert(&vars.p.p2, x, y + 1, vars);
-			vars.p.color1[0] = (vars.map.color[y][x] >> 16) & 0xFF;
-			vars.p.color1[1] = (vars.map.color[y][x] >> 8) & 0xFF;
-			vars.p.color1[2] = vars.map.color[y][x] & 0xFF;
-			vars.p.color2[0] = (vars.map.color[y + 1][x] >> 16) & 0xFF;
-			vars.p.color2[1] = (vars.map.color[y + 1][x] >> 8) & 0xFF;
-			vars.p.color2[2] = vars.map.color[y + 1][x] & 0xFF;
-			y++;
-			convertndraw(vars, movex, movey);
-		}
+        thread_args[x].vars = vars;
+        thread_args[x].i = x;
+        thread_args[x].movex = movex;
+        thread_args[x].movey = movey;
+        pthread_create(&threads[x], NULL, drawylines_subth, &thread_args[x]);
 		x++;
-	}
+    }
+	x = 0;
+    while (x < vars.map.ppline) 
+        pthread_join(threads[x++], NULL);
 }

@@ -22,6 +22,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <pthread.h>
 # define DIM 1280
 # define ON_DESTROY 17
 # define ESC 65307
@@ -135,6 +136,21 @@ typedef struct s_vars
 	float		heightmod;
 	int			iso;
 }				t_vars;
+
+typedef struct s_drawthread {
+    t_vars vars;
+    int movex;
+    int movey;
+} t_drawthread;
+
+typedef struct s_drawxyth
+{
+    t_vars vars;
+    int i;
+    int movex;
+    int movey;
+} t_drawxyth;
+
 // utils
 char			*ft_strjoin(char const *s1, char const *s2);
 size_t			ft_strlen(const char *c);
@@ -177,6 +193,8 @@ void			drawylines(t_vars vars, int movex, int movey);
 void			drawxlines(t_vars vars, int movex, int movey);
 void			draw_line(t_vars *vars, t_pointi p1, t_pointi p2);
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
+void	convertndraw(t_vars vars, int movex, int movey);
+void	convert(t_point *p, int x, int y, t_vars vars);
 
 t_vars			initvars(char *av);
 int				toggles(t_vars *vars);
@@ -187,4 +205,9 @@ int				mousekeyup(int key, int x, int y, t_vars *vars);
 int				mouse_move(int x, int y, t_vars *vars);
 int				mousekeydown(int key, int x, int y, t_vars *vars);
 
+//threads
+void *drawylines_subth(void* arg);
+void *drawxlines_subth(void* arg);
+void *drawxlines_mainth(void *arg);
+void *drawylines_mainth(void *arg);
 #endif

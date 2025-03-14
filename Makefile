@@ -1,6 +1,6 @@
 NAME = fdf
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -pthread
 SRC = drawingstuff/drawlinetools.c \
 	drawingstuff/drawlines.c \
 	gnl/get_next_line_utils.c \
@@ -17,7 +17,8 @@ SRC = drawingstuff/drawlinetools.c \
 	utils/utilsutils.c \
 	fdf.c \
 	init/checkmap.c \
-	drawingstuff/grading.c
+	drawingstuff/grading.c \
+	drawingstuff/threadedones.c
 
 OBJ_DIR = obj
 OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
@@ -25,7 +26,7 @@ OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 all: $(NAME)
 
 $(NAME): $(OBJ) fdf.h
-	$(CC) $(CFLAGS) $(OBJ) -lmlx -lXext -lX11 -lm -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) libmlx.a -lXext -lX11 -lm -o $(NAME)
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)

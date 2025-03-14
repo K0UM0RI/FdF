@@ -49,27 +49,34 @@ void	draw_line(t_vars *vars, t_pointi p1, t_pointi p2)
 	}
 }
 
-void	drawshape(t_vars vars, int f, char c)
+void drawshape(t_vars vars, int f, char c)
 {
-	static int	movex;
-	static int	movey;
+    static int movex;
+    static int movey;
+    pthread_t thread1, thread2;
+    t_drawthread thread_data;
 
-	if (vars.map.scale > 50)
-		f *= vars.map.scale / 7;
-	else
-		f *= vars.map.scale;
-	if (c == 'x')
-		movex += f;
-	else if (c == 'y')
-		movey += f;
-	else if (c == 'r')
-	{
-		movex = 0;
-		movey = 0;
-	}
-	drawxlines(vars, movex, movey);
-	drawylines(vars, movex, movey);
-	mlx_put_image_to_window(vars.mlx.ptr, vars.mlx.win, vars.img.ptr, 0, 0);
+    if (vars.map.scale > 50)
+        f *= vars.map.scale / 7;
+    else
+        f *= vars.map.scale;
+    if (c == 'x')
+        movex += f;
+    else if (c == 'y')
+        movey += f;
+    else if (c == 'r')
+    {
+        movex = 0;
+        movey = 0;
+    }
+    thread_data.vars = vars;
+    thread_data.movex = movex;
+    thread_data.movey = movey;
+    pthread_create(&thread1, NULL, drawxlines_mainth, &thread_data);
+    pthread_create(&thread2, NULL, drawylines_mainth, &thread_data);
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    mlx_put_image_to_window(vars.mlx.ptr, vars.mlx.win, vars.img.ptr, 0, 0);
 }
 
 void	redraw(t_vars *vars, int f, char c)
